@@ -4,7 +4,7 @@ import Balloons from './Balloons';
 import Wishes22 from './Wishes22';
 import Locked from './Locked';
 import PageHeader from './PageHeader';
-import { AGE, NAME } from '../config';
+import { AGE } from '../config';
 import Icon from './Icon';
 
 export const GAMES = [
@@ -17,10 +17,7 @@ export const GAMES = [
 export default function Games({ lock }) {
   return (
     <>
-      <PageHeader
-        title="Play & celebrate"
-        sub={`Blow out ${NAME}'s candles, pop some balloons and flip the wish cards. Tap anywhere for fireworks.`}
-      />
+      <PageHeader title="Play & celebrate" />
       <div className="game-menu">
         {GAMES.map(([emoji, title, sub, id], i) => (
           <button
