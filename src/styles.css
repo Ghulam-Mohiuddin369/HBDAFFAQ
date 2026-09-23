@@ -14,7 +14,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: 'Outfit', system-ui, sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -39,7 +39,6 @@ button {
     radial-gradient(ellipse 40% 30% at 80% 30%, rgba(255, 95, 162, 0.22), transparent 70%),
     radial-gradient(ellipse 50% 35% at 50% 90%, rgba(94, 240, 255, 0.14), transparent 70%),
     radial-gradient(ellipse 30% 25% at 85% 85%, rgba(255, 209, 102, 0.1), transparent 70%);
-  animation: nebula 60s ease-in-out infinite alternate;
 }
 
 @keyframes nebula {
@@ -68,6 +67,7 @@ button {
 main {
   position: relative;
   z-index: 1;
+  overflow-x: clip;
   animation: fadeIn 1s ease both;
 }
 
@@ -320,7 +320,6 @@ main {
   width: 100%;
   height: 100%;
   cursor: crosshair;
-  filter: drop-shadow(0 0 10px rgba(255, 95, 162, 0.55)) drop-shadow(0 0 30px rgba(155, 107, 255, 0.35));
   touch-action: pan-y;
 }
 
@@ -337,9 +336,29 @@ main {
   display: inline-block;
   opacity: 0;
   text-shadow: 0 0 6px #fff, 0 0 18px var(--pink), 0 0 40px var(--pink), 0 0 80px var(--violet);
-  animation:
-    letter-in 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.4) calc(1.4s + var(--i) * 70ms) forwards,
-    neon 4s ease-in-out calc(3.5s + var(--i) * 120ms) infinite;
+  animation: letter-in 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.4) calc(1.4s + var(--i) * 70ms) forwards;
+}
+
+/* glow drifts pink <-> cyan: a filter animation runs on the GPU, no text repaint */
+.neon-line {
+  animation: neon-hue 4s ease-in-out 3.5s infinite alternate;
+  will-change: filter;
+}
+
+@keyframes neon-hue {
+  0%,
+  45% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(-140deg) brightness(0.85);
+  }
+  53% {
+    filter: hue-rotate(-140deg);
+  }
+  100% {
+    filter: hue-rotate(-140deg);
+  }
 }
 
 @keyframes letter-in {
@@ -383,7 +402,17 @@ main {
   background-clip: text;
   color: transparent;
   filter: drop-shadow(0 0 30px rgba(255, 95, 162, 0.45));
-  animation: name-in 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.2) 2.6s both, shimmer 6s linear infinite;
+  animation: name-in 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.2) 2.6s both, name-hue 7s ease-in-out 3.8s infinite alternate;
+  will-change: filter;
+}
+
+@keyframes name-hue {
+  from {
+    filter: drop-shadow(0 0 30px rgba(255, 95, 162, 0.45)) hue-rotate(0deg);
+  }
+  to {
+    filter: drop-shadow(0 0 30px rgba(255, 95, 162, 0.45)) hue-rotate(55deg);
+  }
 }
 
 @keyframes name-in {

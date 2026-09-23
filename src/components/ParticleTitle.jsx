@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
+import { CANVAS_DPR, LOW_POWER, loop } from '../perf';
 
 const STOPS = [
   [255, 209, 102], // gold
   [255, 95, 162], // pink
   [94, 240, 255], // cyan
 ];
+const BUCKETS = 14; // particles share a handful of colors so each frame needs few fillStyle changes
 
 function colorAt(t) {
   const seg = t < 0.5 ? 0 : 1;
@@ -14,9 +16,10 @@ function colorAt(t) {
   const c = a.map((v, i) => Math.round(v + (b[i] - v) * k));
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
+const PALETTE = Array.from({ length: BUCKETS }, (_, i) => colorAt(i / (BUCKETS - 1)));
 
 // Thousands of particles fly in from everywhere and assemble into the text.
-// They dodge the pointer, and a tap scatters them.
+// They dodge the pointer, a tap scatters them, and the animation pauses while off screen.
 export default function ParticleTitle({ text, onFormed }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
@@ -30,9 +33,11 @@ export default function ParticleTitle({ text, onFormed }) {
     let w = 0;
     let h = 0;
     let particles = [];
-    let raf = 0;
+    let groups = [];
     let alive = true;
     let formed = false;
+    let visible = true;
+    let stop = null;
     const start = performance.now();
     const mouse = { x: -9999, y: -9999 };
 
@@ -42,10 +47,9 @@ export default function ParticleTitle({ text, onFormed }) {
       const rect = wrap.getBoundingClientRect();
       w = Math.max(1, Math.floor(rect.width));
       h = Math.max(1, Math.floor(rect.height));
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = w * CANVAS_DPR;
+      canvas.height = h * CANVAS_DPR;
+      ctx.setTransform(CANVAS_DPR, 0, 0, CANVAS_DPR, 0, 0);
 
       const off = document.createElement('canvas');
       off.width = w;
@@ -58,7 +62,7 @@ export default function ParticleTitle({ text, onFormed }) {
       o.fillStyle = '#fff';
       o.fillText(text, w / 2, h / 2 + fontSize * 0.05);
       const data = o.getImageData(0, 0, w, h).data;
-      const gap = w < 520 ? 4 : 5;
+      const gap = LOW_POWER ? 6 : 5;
       const targets = [];
       for (let y = 0; y < h; y += gap) {
         for (let x = 0; x < w; x += gap) {
@@ -73,15 +77,16 @@ export default function ParticleTitle({ text, onFormed }) {
           y: h / 2 + (Math.random() - 0.5) * h * 2.2,
           vx: 0,
           vy: 0,
-          size: Math.random() * 1.6 + 1.8,
+          size: Math.random() * 1.4 + (LOW_POWER ? 2.4 : 2),
           seed: Math.random() * 1000,
           delay: Math.random() * 0.8,
         };
         p.tx = tx;
         p.ty = ty;
-        p.color = colorAt(Math.min(1, Math.max(0, (tx - w * 0.2) / (w * 0.6))));
+        p.bucket = Math.round(Math.min(1, Math.max(0, (tx - w * 0.2) / (w * 0.6))) * (BUCKETS - 1));
         return p;
       });
+      groups = PALETTE.map((_, b) => particles.filter((p) => p.bucket === b));
     }
 
     function toLocal(e) {
@@ -108,41 +113,44 @@ export default function ParticleTitle({ text, onFormed }) {
     }
 
     function frame(now) {
+      if (!visible) return;
       const t = (now - start) / 1000;
+      const pull = 0.012 + Math.min(t, 3) * 0.008;
+      const hasMouse = mouse.x > -9000;
       ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = 'lighter';
-      for (const p of particles) {
-        const active = t > p.delay;
-        if (active) {
-          const tx = p.tx + Math.sin(t * 1.6 + p.seed) * 0.8;
-          const ty = p.ty + Math.cos(t * 1.3 + p.seed) * 0.8;
-          const pull = 0.012 + Math.min(t, 3) * 0.008;
-          p.vx += (tx - p.x) * pull;
-          p.vy += (ty - p.y) * pull;
+      ctx.globalAlpha = 0.92;
+      for (let b = 0; b < groups.length; b++) {
+        ctx.fillStyle = PALETTE[b];
+        const list = groups[b];
+        for (let i = 0; i < list.length; i++) {
+          const p = list[i];
+          if (t > p.delay) {
+            p.vx += (p.tx + Math.sin(t * 1.6 + p.seed) * 0.8 - p.x) * pull;
+            p.vy += (p.ty + Math.cos(t * 1.3 + p.seed) * 0.8 - p.y) * pull;
+          }
+          if (hasMouse) {
+            const mx = p.x - mouse.x;
+            const my = p.y - mouse.y;
+            const d2 = mx * mx + my * my;
+            if (d2 < 7000) {
+              const d = Math.sqrt(d2) || 1;
+              const f = ((7000 - d2) / 7000) * 3.2;
+              p.vx += (mx / d) * f;
+              p.vy += (my / d) * f;
+            }
+          }
+          p.vx *= 0.86;
+          p.vy *= 0.86;
+          p.x += p.vx;
+          p.y += p.vy;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
         }
-        const mx = p.x - mouse.x;
-        const my = p.y - mouse.y;
-        const d2 = mx * mx + my * my;
-        if (d2 < 7000) {
-          const d = Math.sqrt(d2) || 1;
-          const f = ((7000 - d2) / 7000) * 3.2;
-          p.vx += (mx / d) * f;
-          p.vy += (my / d) * f;
-        }
-        p.vx *= 0.86;
-        p.vy *= 0.86;
-        p.x += p.vx;
-        p.y += p.vy;
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = 0.9;
-        ctx.fillRect(p.x, p.y, p.size, p.size);
       }
       ctx.globalAlpha = 1;
       if (!formed && t > 2.6) {
         formed = true;
         formedRef.current?.();
       }
-      raf = requestAnimationFrame(frame);
     }
 
     let resizeTimer = 0;
@@ -150,18 +158,24 @@ export default function ParticleTitle({ text, onFormed }) {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(build, 120);
     });
+    // pause the whole simulation while the hero is scrolled away
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
     build().then(() => {
-      if (alive) raf = requestAnimationFrame(frame);
+      if (alive) stop = loop(frame, LOW_POWER ? 40 : 60);
     });
     ro.observe(wrap);
+    io.observe(wrap);
     canvas.addEventListener('pointermove', onMove);
     canvas.addEventListener('pointerleave', onLeave);
     canvas.addEventListener('pointerdown', onDown);
     return () => {
       alive = false;
-      cancelAnimationFrame(raf);
+      stop?.();
       clearTimeout(resizeTimer);
       ro.disconnect();
+      io.disconnect();
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerleave', onLeave);
       canvas.removeEventListener('pointerdown', onDown);

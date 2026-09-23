@@ -114,7 +114,12 @@ export default function App() {
             </footer>
           </main>
           <MusicToggle />
-          {lock.admin && <span className="admin-badge">Admin preview: unlocked for you only</span>}
+          {lock.isAdmin && (
+            <span className="admin-badge">
+              <Icon name="lock" size={13} />
+              {lock.admin ? 'Admin preview: unlocked for you only' : 'Admin mode'}
+            </span>
+          )}
         </>
       )}
       {!gateGone && <Gate onOpen={open} />}

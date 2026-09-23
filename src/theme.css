@@ -1446,3 +1446,171 @@ body {
     padding: 11px 10px;
   }
 }
+
+
+/* ---------- performance ---------- */
+
+/* static glow behind the particle "22" replaces the old per-frame canvas filter */
+.particle-title {
+  position: relative;
+}
+
+.particle-title::before {
+  content: '';
+  position: absolute;
+  inset: 12% 22%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 95, 162, 0.28), rgba(155, 107, 255, 0.14) 45%, transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.particle-title canvas {
+  position: relative;
+}
+
+/* keep the cake glow inside the screen width */
+.cake-halo {
+  max-width: 100vw;
+}
+
+/* page titles: animate without filter (animated filter + gradient text vanishes on Android Chrome) */
+.page-title {
+  filter: none;
+  animation: page-title-in 0.9s var(--ease-pop) both, shimmer 6s linear infinite;
+}
+
+@keyframes page-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+}
+
+/* glass blur only where it matters: buttons and cards use tinted glass without re-blurring every frame */
+.btn,
+.nav-pill,
+.memory-card,
+.glass-card,
+.game-card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.glass-card {
+  background: linear-gradient(160deg, rgba(40, 20, 88, 0.72), rgba(22, 10, 54, 0.72));
+}
+
+.memory-card {
+  background: linear-gradient(160deg, rgba(48, 26, 100, 0.7), rgba(24, 12, 58, 0.7));
+}
+
+/* phones: no live blur at all (it re-renders on every animation frame), a bit more opaque instead,
+   and the always-running text shimmer/neon loops are replaced with their resting look */
+@media (pointer: coarse), (max-width: 768px) {
+  :root {
+    --glass-blur: none;
+  }
+
+  .glass-nav,
+  .brand {
+    background: linear-gradient(180deg, rgba(58, 32, 112, 0.92), rgba(30, 14, 70, 0.92));
+  }
+
+  .toast,
+  .locked-panel,
+  .vc-bar,
+  .vc-center,
+  .music-toggle,
+  .glass-circle,
+  .admin-badge {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .locked-panel {
+    background: linear-gradient(160deg, rgba(44, 20, 96, 0.94), rgba(22, 10, 54, 0.94));
+  }
+
+  .toast {
+    background: linear-gradient(160deg, rgba(50, 22, 105, 0.97), rgba(24, 10, 58, 0.97));
+  }
+
+  .modal-backdrop,
+  .dialog-backdrop,
+  .lightbox {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .nebula {
+    animation: none;
+  }
+
+  .neon-line span {
+    animation: letter-in 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.4) calc(1.4s + var(--i) * 70ms) forwards;
+  }
+
+  .hero-name {
+    animation: name-in 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.2) 2.6s both;
+    filter: none;
+  }
+
+  .page-title {
+    animation: page-title-in 0.9s var(--ease-pop) both;
+  }
+
+  .section-title {
+    filter: none;
+  }
+
+  .memory-card {
+    filter: none !important;
+  }
+
+  .avatar-ring,
+  .avatar {
+    animation-duration: 10s;
+  }
+}
+
+/* ---------- admin badge ---------- */
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+/* page titles: hue drift instead of a repainting shimmer */
+.page-title {
+  animation: page-title-in 0.9s var(--ease-pop) both, title-hue 7s ease-in-out 1s infinite alternate;
+  will-change: filter;
+}
+
+@keyframes title-hue {
+  from {
+    filter: hue-rotate(0deg);
+  }
+  to {
+    filter: hue-rotate(55deg);
+  }
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+  .page-title {
+    animation: page-title-in 0.9s var(--ease-pop) both;
+    will-change: auto;
+  }
+
+  .neon-line {
+    animation: none;
+    will-change: auto;
+  }
+
+  .hero-name {
+    will-change: auto;
+  }
+}

@@ -13,7 +13,7 @@ export function useUnlock() {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!unlockDate) return;
+    if (!unlockDate && !adminKey) return;
     fetch('/api/status', { headers: adminKey ? { 'x-admin-key': adminKey } : {} })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -33,7 +33,8 @@ export function useUnlock() {
     return () => clearInterval(id);
   }, [ticking]);
 
-  return { open: !ticking || admin, left, admin: admin && ticking, date: unlockDate };
+  // isAdmin: key verified by the server. admin: previewing while still locked for everyone else.
+  return { open: !ticking || admin, left, admin: admin && ticking, isAdmin: admin, date: unlockDate };
 }
 
 export function formatUnlock(date) {

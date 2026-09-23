@@ -1,4 +1,19 @@
 import { useEffect, useRef } from 'react';
+import { CANVAS_DPR, LOW_POWER, loop } from '../perf';
+
+// Pre-rendered glowing dot, drawn with drawImage (much cheaper than building paths per star).
+function makeSprite(color) {
+  const s = document.createElement('canvas');
+  s.width = s.height = 16;
+  const g = s.getContext('2d');
+  const grad = g.createRadialGradient(8, 8, 0, 8, 8, 8);
+  grad.addColorStop(0, color);
+  grad.addColorStop(0.35, color);
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 16, 16);
+  return s;
+}
 
 // Twinkling, drifting star layers with mouse parallax and the odd shooting star.
 export default function Starfield() {
@@ -7,29 +22,28 @@ export default function Starfield() {
   useEffect(() => {
     const canvas = ref.current;
     const ctx = canvas.getContext('2d');
+    const sprites = [makeSprite('#f3eeff'), makeSprite('#ffb3dd'), makeSprite('#aef6ff')];
     let w = 0;
     let h = 0;
     let stars = [];
     let shooting = null;
     let nextShoot = performance.now() + 2500;
-    let raf = 0;
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
 
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = window.innerWidth;
       h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(700, Math.floor((w * h) / 2200));
+      canvas.width = w * CANVAS_DPR;
+      canvas.height = h * CANVAS_DPR;
+      ctx.setTransform(CANVAS_DPR, 0, 0, CANVAS_DPR, 0, 0);
+      const count = Math.min(LOW_POWER ? 180 : 420, Math.floor((w * h) / (LOW_POWER ? 3200 : 2600)));
       stars = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
         z: Math.random() * 0.8 + 0.2,
         phase: Math.random() * Math.PI * 2,
         speed: Math.random() * 2 + 0.5,
-        hue: Math.random() < 0.15 ? (Math.random() < 0.5 ? 320 : 190) : 250,
+        sprite: sprites[Math.random() < 0.85 ? 0 : Math.random() < 0.5 ? 1 : 2],
       }));
     }
 
@@ -45,24 +59,14 @@ export default function Starfield() {
       ctx.clearRect(0, 0, w, h);
 
       for (const s of stars) {
-        s.y += s.z * 0.08;
+        s.y += s.z * 0.1;
         if (s.y > h + 5) {
           s.y = -5;
           s.x = Math.random() * w;
         }
-        const px = s.x - mouse.x * s.z * 24;
-        const py = s.y - mouse.y * s.z * 24;
-        const tw = 0.55 + 0.45 * Math.sin(t * s.speed + s.phase);
-        const r = s.z * 1.5;
-        ctx.globalAlpha = tw * s.z;
-        ctx.fillStyle = `hsl(${s.hue}, 100%, ${s.hue === 250 ? 92 : 75}%)`;
-        if (r > 1.1) {
-          ctx.beginPath();
-          ctx.arc(px, py, r, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          ctx.fillRect(px, py, r * 1.6, r * 1.6);
-        }
+        const size = s.z * 4.5;
+        ctx.globalAlpha = (0.55 + 0.45 * Math.sin(t * s.speed + s.phase)) * s.z;
+        ctx.drawImage(s.sprite, s.x - mouse.x * s.z * 24 - size / 2, s.y - mouse.y * s.z * 24 - size / 2, size, size);
       }
 
       if (!shooting && now > nextShoot) {
@@ -79,15 +83,12 @@ export default function Starfield() {
         s.x += s.vx;
         s.y += s.vy;
         s.life -= 0.012;
-        const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx * 14, s.y - s.vy * 14);
-        grad.addColorStop(0, 'rgba(255,255,255,0.95)');
-        grad.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.globalAlpha = Math.max(s.life, 0);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
+        ctx.globalAlpha = Math.max(s.life, 0) * 0.9;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
         ctx.moveTo(s.x, s.y);
-        ctx.lineTo(s.x - s.vx * 14, s.y - s.vy * 14);
+        ctx.lineTo(s.x - s.vx * 10, s.y - s.vy * 10);
         ctx.stroke();
         if (s.life <= 0 || s.x < -100 || s.y > h + 100) {
           shooting = null;
@@ -95,15 +96,14 @@ export default function Starfield() {
         }
       }
       ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(frame);
     }
 
     resize();
     window.addEventListener('resize', resize);
-    window.addEventListener('pointermove', onMove);
-    raf = requestAnimationFrame(frame);
+    if (!LOW_POWER) window.addEventListener('pointermove', onMove);
+    const stop = loop(frame, LOW_POWER ? 30 : 50);
     return () => {
-      cancelAnimationFrame(raf);
+      stop();
       window.removeEventListener('resize', resize);
       window.removeEventListener('pointermove', onMove);
     };
