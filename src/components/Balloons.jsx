@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { fx } from '../fx';
+import { playPop } from '../sfx';
 import { BALLOON_MESSAGES } from '../config';
 
 const COLORS = ['#ff5fa2', '#ffd166', '#5ef0ff', '#b388ff', '#ff8a5b', '#7dffb0', '#ff7a7a'];
@@ -29,6 +30,7 @@ export default function Balloons() {
     const field = fieldRef.current.getBoundingClientRect();
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height * 0.35;
+    playPop();
     fx.burst(cx, cy, { colors: [b.color, '#ffffff'], count: 60, shape: 'sphere' });
     const text = BALLOON_MESSAGES[popped % BALLOON_MESSAGES.length];
     const note = { id: b.id, text, x: cx - field.left, y: cy - field.top, color: b.color };
