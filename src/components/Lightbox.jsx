@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { adminKey, mediaUrl, videoPoster } from '../api';
 import { timeAgo } from '../time';
 
@@ -22,7 +23,8 @@ export default function Lightbox({ items, index, onIndex, onClose, onDelete }) {
 
   if (!m) return null;
 
-  return (
+  // Portal to <body> so the viewer covers the fixed header too
+  return createPortal(
     <div className="lightbox" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <button className="icon-btn lightbox-close" onClick={onClose} aria-label="Close">✕</button>
       {index > 0 && (
@@ -63,6 +65,7 @@ export default function Lightbox({ items, index, onIndex, onClose, onDelete }) {
           </footer>
         </aside>
       </article>
-    </div>
+    </div>,
+    document.body,
   );
 }
