@@ -12,7 +12,6 @@ export default route({
   },
 
   POST: async (req, res) => {
-    if (isLocked(req)) throw new HttpError(423, 'This opens at midnight on his birthday 🎂');
     const body = await readJson(req);
     const name = cleanText(body.name, 40);
     const message = cleanText(body.message, 280);

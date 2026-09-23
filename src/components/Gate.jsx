@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { NAME } from '../config';
 
 // Opening screen: a glowing gift box. Opening it also unlocks audio (browsers need a tap first).
 export default function Gate({ onOpen }) {
@@ -13,8 +12,6 @@ export default function Gate({ onOpen }) {
 
   return (
     <div className={`gate ${opening ? 'is-opening' : ''}`}>
-      <p className="gate-eyebrow">Psst… something special is waiting for</p>
-      <h1 className="gate-name">{NAME}</h1>
       <button className="gift" onClick={open} aria-label="Open the gift">
         <span className="gift-glow" />
         <span className="gift-lid">
@@ -23,7 +20,7 @@ export default function Gate({ onOpen }) {
         </span>
         <span className="gift-box" />
       </button>
-      <p className="gate-hint">Tap the gift to open</p>
+      <p className="gate-hint">Open it!</p>
     </div>
   );
 }

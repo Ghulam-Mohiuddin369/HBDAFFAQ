@@ -5,10 +5,7 @@ export const AGE = 22;
 
 // 🔒 Everything stays blurred and locked until this exact moment, then opens for everyone.
 // Midnight Pakistan time on his birthday, e.g. '2026-10-05T00:00:00+05:00'. null = never locked.
-// ⏸️ Timer paused while the site is being finished. To turn it back on, uncomment this line
-// and delete the null line below:
-// export const UNLOCK_AT = '2026-09-24T00:00:00+05:00';
-export const UNLOCK_AT = null;
+export const UNLOCK_AT = '2026-09-24T00:00:00+05:00';
 
 // Who the letter is from
 export const FROM = 'MD';

@@ -9,7 +9,7 @@ import { NAME } from '../config';
 export default function WishesPage({ lock, wishes, onDelete }) {
   function onDone(wish) {
     wishes.prepend(wish);
-    toast('Your wish is on the wall!', 'success');
+    toast(lock.open ? 'Your wish is on the wall!' : 'Wish saved! It shows up on the wall at midnight.', 'success');
     fx.confetti(180);
     fx.show(4, 1200);
     setTimeout(() => document.getElementById('wall')?.scrollIntoView({ behavior: 'smooth' }), 300);
@@ -19,14 +19,14 @@ export default function WishesPage({ lock, wishes, onDelete }) {
     <>
       <PageHeader
         title="Send wishes"
-        sub={`Write ${NAME} a birthday note. It gets pinned to the wall for everyone to see.`}
+        sub={lock.open
+          ? `Write ${NAME} a birthday note. It gets pinned to the wall for everyone to see.`
+          : `Write ${NAME} a birthday note now. Every wish stays hidden until midnight, then they all appear at once.`}
       />
       <section className="page-section">
-        <Locked lock={lock} label="Wishing opens in">
-          <div className="glass-card form-card">
-            <WishForm onDone={onDone} />
-          </div>
-        </Locked>
+        <div className="glass-card form-card">
+          <WishForm onDone={onDone} />
+        </div>
       </section>
       <section id="wall" className="page-section is-wide">
         <h2 className="section-title">The wishing wall</h2>

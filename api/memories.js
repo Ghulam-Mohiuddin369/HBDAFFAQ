@@ -15,7 +15,6 @@ export default route({
   },
 
   POST: async (req, res) => {
-    if (isLocked(req)) throw new HttpError(423, 'This opens at midnight on his birthday 🎂');
     const body = await readJson(req);
     const cloud = process.env.CLOUDINARY_CLOUD_NAME;
     const type = body.type === 'video' ? 'video' : 'image';

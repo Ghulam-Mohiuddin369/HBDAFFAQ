@@ -32,16 +32,21 @@ export default function App() {
 
   // Midnight: celebrate for everyone who has the page open
   const wasOpen = useRef(lock.open);
+  const openedRef = useRef(false);
+  openedRef.current = opened;
   useEffect(() => {
     if (lock.open && !wasOpen.current && !lock.admin) {
       fx.show(14, 4000);
       fx.confetti(300);
-      dialog({
-        icon: 'cake',
-        title: `It's ${NAME}'s birthday!`,
-        message: 'Everything is unlocked. Send your wishes, share memories and play the games!',
-        confirmText: "Let's party",
-      });
+      // visitors waiting on the gift screen just see it light up with "Open it!"
+      if (openedRef.current) {
+        dialog({
+          icon: 'cake',
+          title: `It's ${NAME}'s birthday!`,
+          message: 'Everything is unlocked. Send your wishes, share memories and play the games!',
+          confirmText: "Let's party",
+        });
+      }
     }
     wasOpen.current = lock.open;
   }, [lock.open, lock.admin]);

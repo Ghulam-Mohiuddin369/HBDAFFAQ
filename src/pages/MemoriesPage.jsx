@@ -9,7 +9,7 @@ import { NAME } from '../config';
 export default function MemoriesPage({ lock, memories, onDelete }) {
   function onDone(memory) {
     memories.prepend(memory);
-    toast('Memory shared! Everyone can see it now.', 'success');
+    toast(lock.open ? 'Memory shared! Everyone can see it now.' : 'Memory saved! It shows up at midnight.', 'success');
     fx.confetti(180);
     fx.show(4, 1200);
     setTimeout(() => document.getElementById('memories')?.scrollIntoView({ behavior: 'smooth' }), 300);
@@ -19,14 +19,14 @@ export default function MemoriesPage({ lock, memories, onDelete }) {
     <>
       <PageHeader
         title="Share a memory"
-        sub={`Got a photo or video with ${NAME}? Post it here and it joins his birthday feed.`}
+        sub={lock.open
+          ? `Got a photo or video with ${NAME}? Post it here and it joins his birthday feed.`
+          : `Got a photo or video with ${NAME}? Post it now. Every memory stays hidden until midnight.`}
       />
       <section className="page-section">
-        <Locked lock={lock} label="Uploads open in">
-          <div className="glass-card form-card">
-            <UploadForm onDone={onDone} />
-          </div>
-        </Locked>
+        <div className="glass-card form-card">
+          <UploadForm onDone={onDone} />
+        </div>
       </section>
       <section id="memories" className="page-section is-feed">
         <h2 className="section-title">All memories</h2>
