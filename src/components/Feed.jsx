@@ -5,6 +5,12 @@ import { navigate } from '../router';
 import { AGE, AVATAR, BIO, HANDLE, NAME } from '../config';
 import Icon from './Icon';
 
+const HIGHLIGHTS = [
+  ...GAMES.slice(0, 1).map(([icon, label, , id]) => [icon, label, id, '/games']),
+  ['mail', 'Open the letter', 'letter', '/wishes'],
+  ...GAMES.slice(1).map(([icon, label, , id]) => [icon, label, id, '/games']),
+];
+
 // Instagram-style profile + memories/wishes tabs. `teaser` renders placeholder content for the lock screen.
 export default function Feed({ tab, onTab, memories, wishes, onDelete, teaser = false }) {
   const toWishes = () => navigate('/wishes');
@@ -38,8 +44,8 @@ export default function Feed({ tab, onTab, memories, wishes, onDelete, teaser = 
       </div>
 
       <nav className="highlights" aria-label="Highlights">
-        {GAMES.map(([emoji, label, , id]) => (
-          <button key={id} className="highlight" onClick={() => navigate('/games', id)}>
+        {HIGHLIGHTS.map(([emoji, label, id, path]) => (
+          <button key={id} className="highlight" onClick={() => navigate(path, id)}>
             <span className="highlight-ring"><span><Icon name={emoji} size={26} strokeWidth={1.7} /></span></span>
             <small>{label}</small>
           </button>

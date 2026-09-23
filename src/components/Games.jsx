@@ -1,5 +1,4 @@
 import Cake from './Cake';
-import Letter from './Letter';
 import Balloons from './Balloons';
 import Wishes22 from './Wishes22';
 import Locked from './Locked';
@@ -9,7 +8,6 @@ import Icon from './Icon';
 
 export const GAMES = [
   ['cake', 'Blow the candles', `${AGE} candles, one wish`, 'cake'],
-  ['mail', 'Open the letter', 'A note just for him', 'letter'],
   ['balloon', 'Pop balloons', 'Each hides a message', 'balloons'],
   ['sparkles', `${AGE} wishes`, 'Flip all the cards', 'wishes22'],
 ];
@@ -34,7 +32,6 @@ export default function Games({ lock }) {
         ))}
       </div>
       <Locked lock={lock} label="The cake gets lit in"><Cake /></Locked>
-      <Locked lock={lock} label="The letter opens in"><Letter /></Locked>
       <Locked lock={lock} label="Balloons release in"><Balloons /></Locked>
       <Locked lock={lock} label={`The ${AGE} wishes unlock in`}><Wishes22 /></Locked>
     </>

@@ -1,6 +1,7 @@
 import PageHeader from '../components/PageHeader';
 import Locked from '../components/Locked';
 import WishForm from '../components/WishForm';
+import Letter from '../components/Letter';
 import WishWall, { SAMPLE_WISHES } from '../components/WishWall';
 import { fx } from '../fx';
 import { toast } from '../ui';
@@ -28,6 +29,9 @@ export default function WishesPage({ lock, wishes, onDelete }) {
           <WishForm onDone={onDone} />
         </div>
       </section>
+      <Locked lock={lock} label="The letter opens in">
+        <Letter />
+      </Locked>
       <section id="wall" className="page-section is-wide">
         <h2 className="section-title">The wishing wall</h2>
         <p className="section-sub">
