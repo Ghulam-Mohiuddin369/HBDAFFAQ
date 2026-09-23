@@ -42,7 +42,7 @@ export default function Letter() {
               {i === paragraphs.length - 1 && !done && <span className="caret" />}
             </p>
           ))}
-          {done && <p className="letter-sign">With love, {FROM}</p>}
+          {done && <p className="letter-sign">{FROM}</p>}
         </div>
         <div className="envelope-front" />
         <div className="envelope-flap" />
