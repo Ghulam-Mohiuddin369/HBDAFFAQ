@@ -8,7 +8,7 @@ export const AGE = 22;
 export const UNLOCK_AT = '2026-09-24T00:00:00+05:00';
 
 // Who the letter is from
-export const FROM = 'MD';
+export const FROM = 'All friends and well-wishers';
 
 export const LETTER = [
   'Dear Affaq,',
