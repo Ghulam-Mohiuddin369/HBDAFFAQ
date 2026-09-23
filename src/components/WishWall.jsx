@@ -2,6 +2,7 @@ import { adminKey } from '../api';
 import { timeAgo } from '../time';
 import { NAME } from '../config';
 import { NOTE_COLORS } from './WishForm';
+import Icon from './Icon';
 
 function tilt(id) {
   let h = 0;
@@ -37,10 +38,10 @@ export default function WishWall({ wishes, onDelete, onWish }) {
   if (wishes.status === 'ready' && wishes.items.length === 0) {
     return (
       <div className="feed-empty">
-        <span className="feed-empty-icon">💌</span>
+        <span className="feed-empty-icon"><Icon name="mail" size={34} strokeWidth={1.6} /></span>
         <strong>No wishes yet</strong>
         <p>Be the first to wish {NAME} a happy birthday!</p>
-        {onWish && <button className="btn btn-primary" onClick={onWish}>💌 Send a wish</button>}
+        {onWish && <button className="btn btn-primary" onClick={onWish}><Icon name="send" /> Send a wish</button>}
       </div>
     );
   }
@@ -61,7 +62,7 @@ export default function WishWall({ wishes, onDelete, onWish }) {
             <span>{timeAgo(w.createdAt)}</span>
           </footer>
           {adminKey && onDelete && (
-            <button className="note-delete" onClick={() => onDelete('wishes', w)} aria-label="Delete wish">✕</button>
+            <button className="note-delete" onClick={() => onDelete('wishes', w)} aria-label="Delete wish"><Icon name="x" size={14} /></button>
           )}
         </article>
       ))}

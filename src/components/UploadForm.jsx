@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, uploadMedia } from '../api';
 import { rememberedName, rememberName } from './WishForm';
+import Icon from './Icon';
 
 const MAX_IMAGE_MB = 15;
 const MAX_VIDEO_MB = 100;
@@ -101,7 +102,7 @@ export default function UploadForm({ onDone }) {
           )
         ) : (
           <span className="dropzone-empty">
-            <span className="dropzone-icon">📸</span>
+            <span className="dropzone-icon"><Icon name="camera" size={30} strokeWidth={1.6} /></span>
             <strong>Tap to choose a photo or video</strong>
             <small>or drag it here · photos up to {MAX_IMAGE_MB} MB, videos up to {MAX_VIDEO_MB} MB</small>
           </span>
@@ -124,14 +125,19 @@ export default function UploadForm({ onDone }) {
         />
       </label>
 
-      {busy && (
-        <div className="progress" aria-label="Upload progress">
-          <span style={{ width: `${Math.round(progress * 100)}%` }} />
-          <em>{progress < 1 ? `Uploading… ${Math.round(progress * 100)}%` : 'Almost done…'}</em>
-        </div>
-      )}
-      <button className="btn btn-primary btn-block" disabled={busy}>
-        {busy ? 'Sharing…' : 'Share this memory ✨'}
+      {/* the button itself fills up as the upload progresses */}
+      <button
+        className={`btn btn-primary btn-block btn-progress ${busy ? 'is-busy' : ''}`}
+        disabled={busy}
+        style={{ '--p': `${Math.round(progress * 100)}%` }}
+        aria-live="polite"
+      >
+        <span className="btn-progress-fill" aria-hidden="true" />
+        <span className="btn-progress-label">
+          {!busy && <><Icon name="upload" /> Share this memory</>}
+          {busy && progress < 1 && `Uploading ${Math.round(progress * 100)}%`}
+          {busy && progress >= 1 && 'Almost done…'}
+        </span>
       </button>
       {error && <p className="form-error" role="alert">{error}</p>}
     </form>

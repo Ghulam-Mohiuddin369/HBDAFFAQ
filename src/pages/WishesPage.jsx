@@ -31,7 +31,7 @@ export default function WishesPage({ lock, wishes, onDelete }) {
       <section id="wall" className="page-section is-wide">
         <h2 className="section-title">The wishing wall</h2>
         <p className="section-sub">
-          {lock.open ? `${wishes.items.length} ${wishes.items.length === 1 ? 'wish' : 'wishes'} and counting 💌` : 'Every wish shows up here at midnight 💌'}
+          {lock.open ? `${wishes.items.length} ${wishes.items.length === 1 ? 'wish' : 'wishes'} and counting` : 'Every wish shows up here at midnight'}
         </p>
         <Locked lock={lock} label="The wall opens in" preview={<WishWall wishes={SAMPLE_WISHES} />}>
           <WishWall wishes={wishes} onDelete={onDelete} />

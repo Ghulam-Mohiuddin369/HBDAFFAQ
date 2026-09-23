@@ -13,7 +13,7 @@ export default function MusicToggle() {
   return (
     <button className={`music-toggle ${on ? 'is-on' : ''}`} onClick={toggle} aria-label={on ? 'Mute music' : 'Play music'}>
       <span className="vinyl" />
-      <span className="music-label">{on ? '♫ On' : '♪ Off'}</span>
+      <span className="music-label">{on ? 'Music on' : 'Music off'}</span>
     </button>
   );
 }

@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { closeDialog, usePopups } from '../ui';
+import Icon from './Icon';
 
-const ICONS = { success: '🎉', error: '⚠️', info: '✨' };
+const ICONS = { success: 'check', error: 'alert', info: 'sparkles' };
 
 export default function Popups() {
   const { toasts, dialog } = usePopups();
@@ -21,7 +22,7 @@ export default function Popups() {
       <div className="toast-stack" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className={`toast is-${t.tone}`} role="status">
-            <span className="toast-icon">{ICONS[t.tone] || ICONS.info}</span>
+            <span className="toast-icon"><Icon name={ICONS[t.tone] || ICONS.info} size={20} /></span>
             <span>{t.message}</span>
           </div>
         ))}
@@ -29,7 +30,7 @@ export default function Popups() {
       {dialog && (
         <div className="dialog-backdrop" onMouseDown={(e) => e.target === e.currentTarget && closeDialog(false)}>
           <div className="dialog" role="alertdialog" aria-modal="true" aria-label={dialog.title}>
-            <span className="dialog-icon">{dialog.icon}</span>
+            <span className="dialog-icon"><Icon name={dialog.icon} size={30} /></span>
             <h3>{dialog.title}</h3>
             {dialog.message && <p>{dialog.message}</p>}
             <div className="dialog-actions">

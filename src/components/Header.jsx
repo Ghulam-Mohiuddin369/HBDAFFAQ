@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { navigate } from '../router';
 import { AGE, NAME } from '../config';
+import Icon from './Icon';
 
 const LINKS = [
-  ['wishes', '/wishes', '💌', 'Send wishes', 'Wishes'],
-  ['memories', '/memories', '📸', 'Share memory', 'Memory'],
-  ['games', '/games', '🎮', 'Games', 'Games'],
+  ['wishes', '/wishes', 'mail', 'Send wishes', 'Wishes'],
+  ['memories', '/memories', 'camera', 'Share memory', 'Memory'],
+  ['games', '/games', 'gamepad', 'Games', 'Games'],
 ];
 
 export default function Header({ page }) {
@@ -26,7 +27,7 @@ export default function Header({ page }) {
   return (
     <header className={`topbar ${scrolled ? 'is-scrolled' : ''}`}>
       <a href="/" className="brand" onClick={(e) => go(e, '/')} aria-label="Home">
-        <span className="brand-icon">🎂</span>
+        <span className="brand-icon"><Icon name="cake" size={18} /></span>
         <span className="brand-name">{NAME}</span>
         <span className="brand-age">✦{AGE}</span>
       </a>
@@ -39,7 +40,7 @@ export default function Header({ page }) {
             aria-current={page === key ? 'page' : undefined}
             onClick={(e) => go(e, path)}
           >
-            <span aria-hidden="true">{icon}</span>
+            <Icon name={icon} size={17} />
             <span className="full">{full}</span>
             <span className="short">{short}</span>
           </a>

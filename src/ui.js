@@ -16,7 +16,7 @@ export function toast(message, tone = 'info') {
   setTimeout(() => set({ toasts: state.toasts.filter((t) => t.id !== id) }), 4000);
 }
 
-export function dialog({ icon = '🎉', title, message, confirmText = 'OK', cancelText = null }) {
+export function dialog({ icon = 'sparkles', title, message, confirmText = 'OK', cancelText = null }) {
   return new Promise((resolve) => {
     state.dialog?.resolve(false);
     set({ dialog: { icon, title, message, confirmText, cancelText, resolve } });

@@ -2,6 +2,7 @@ import ParticleTitle from './ParticleTitle';
 import Countdown from './Countdown';
 import { fx } from '../fx';
 import { AGE, NAME } from '../config';
+import Icon from './Icon';
 
 const LINE = 'Happy Birthday';
 
@@ -27,7 +28,7 @@ export default function Hero({ lock }) {
         <p className="hero-tip">Tap anywhere for fireworks · move over the {AGE} to play</p>
       ) : (
         <div className="hero-lock">
-          <p>🔒 The party unlocks at midnight</p>
+          <p><Icon name="lock" size={14} /> The party unlocks at midnight</p>
           <Countdown left={lock.left} />
         </div>
       )}

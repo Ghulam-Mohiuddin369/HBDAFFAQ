@@ -17,6 +17,7 @@ import { fx } from './fx';
 import { music } from './music';
 import { AGE, NAME } from './config';
 import { navigate, usePage } from './router';
+import Icon from './components/Icon';
 
 const INTERACTIVE = 'button, a, input, textarea, label, video, .no-fx';
 const finePointer = typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
@@ -36,10 +37,10 @@ export default function App() {
       fx.show(14, 4000);
       fx.confetti(300);
       dialog({
-        icon: '🎂',
+        icon: 'cake',
         title: `It's ${NAME}'s birthday!`,
         message: 'Everything is unlocked. Send your wishes, share memories and play the games!',
-        confirmText: "Let's party 🎉",
+        confirmText: "Let's party",
       });
     }
     wasOpen.current = lock.open;
@@ -63,7 +64,7 @@ export default function App() {
 
   async function remove(kind, item) {
     const ok = await dialog({
-      icon: '🗑️',
+      icon: 'trash',
       title: 'Delete this for everyone?',
       message: 'This removes it from the site permanently.',
       confirmText: 'Delete',
@@ -96,17 +97,24 @@ export default function App() {
           <main key={page} onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
             <ErrorBoundary>{pages[page]}</ErrorBoundary>
             <footer className="site-footer">
-              <p>Made with 💜 for {NAME}&apos;s {AGE}nd birthday</p>
+              <p className="footer-love">Made with <Icon name="heart" size={15} /> for {NAME}&apos;s {AGE}nd birthday</p>
               <div className="profile-actions">
-                {page !== 'home' && <button className="btn btn-sm" onClick={() => navigate('/')}>🏠 Home</button>}
-                {page !== 'wishes' && <button className="btn btn-sm" onClick={() => navigate('/wishes')}>💌 Send wishes</button>}
-                {page !== 'memories' && <button className="btn btn-sm" onClick={() => navigate('/memories')}>📸 Share memory</button>}
-                {page !== 'games' && <button className="btn btn-sm" onClick={() => navigate('/games')}>🎮 Games</button>}
+                {page !== 'home' && <button className="btn btn-sm" onClick={() => navigate('/')}><Icon name="home" size={16} /> Home</button>}
+                {page !== 'wishes' && <button className="btn btn-sm" onClick={() => navigate('/wishes')}><Icon name="mail" size={16} /> Send wishes</button>}
+                {page !== 'memories' && <button className="btn btn-sm" onClick={() => navigate('/memories')}><Icon name="camera" size={16} /> Share memory</button>}
+                {page !== 'games' && <button className="btn btn-sm" onClick={() => navigate('/games')}><Icon name="gamepad" size={16} /> Games</button>}
+              </div>
+              <div className="credit">
+                <span className="credit-line" aria-hidden="true" />
+                <p>
+                  <Icon name="gift" size={16} /> A gift from <strong>MD TECH</strong>
+                </p>
+                <small>This website was made by MD for {NAME}.</small>
               </div>
             </footer>
           </main>
           <MusicToggle />
-          {lock.admin && <span className="admin-badge">👑 Admin preview: unlocked for you only</span>}
+          {lock.admin && <span className="admin-badge">Admin preview: unlocked for you only</span>}
         </>
       )}
       {!gateGone && <Gate onOpen={open} />}

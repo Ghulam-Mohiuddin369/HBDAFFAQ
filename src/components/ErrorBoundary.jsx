@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import Icon from './Icon';
 
 // Keeps one broken section from blanking the whole page.
 export default class ErrorBoundary extends Component {
@@ -16,7 +17,7 @@ export default class ErrorBoundary extends Component {
     return (
       <div className="crash">
         <div className="dialog">
-          <span className="dialog-icon">🎈</span>
+          <span className="dialog-icon"><Icon name="balloon" size={30} /></span>
           <h3>Oops, a balloon popped</h3>
           <p>Something went wrong on this page. A refresh usually fixes it.</p>
           <div className="dialog-actions">

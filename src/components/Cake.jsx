@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { fx } from '../fx';
 import { AGE } from '../config';
 import { useReveal } from '../useReveal';
+import Icon from './Icon';
 
 const RY = 30; // half-height of the top tier's elliptical surface, in cake units
 
@@ -127,7 +128,7 @@ export default function Cake() {
       <h2 className="section-title">Make a wish, {' '}blow the candles</h2>
       <p className="section-sub">
         {allOut
-          ? 'Wish sent to the universe ✨'
+          ? 'Wish sent to the universe.'
           : `${litCount} of ${AGE} candles still burning: tap them, or actually blow into your mic`}
       </p>
 
@@ -188,13 +189,13 @@ export default function Cake() {
 
       <div className="cake-actions">
         {allOut ? (
-          <button className="btn btn-ghost" onClick={relight}>🔥 Light them again</button>
+          <button className="btn btn-ghost" onClick={relight}><Icon name="flame" /> Light them again</button>
         ) : (
           <>
             {listening ? (
-              <button className="btn btn-primary is-pulsing" onClick={stopMic}>🎤 Listening… blow now!</button>
+              <button className="btn btn-primary is-pulsing" onClick={stopMic}><Icon name="mic" /> Listening… blow now!</button>
             ) : (
-              <button className="btn btn-primary" onClick={startMic}>🌬️ Blow with your mic</button>
+              <button className="btn btn-primary" onClick={startMic}><Icon name="wind" /> Blow with your mic</button>
             )}
             <button className="btn btn-ghost" onClick={blowAll}>Blow them all out</button>
           </>

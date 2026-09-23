@@ -1,39 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Lightbox from './Lightbox';
+import Icon from './Icon';
 import { mediaUrl, videoPoster } from '../api';
 import { NAME } from '../config';
 
-function Tile({ m, fresh, onOpen }) {
-  const video = m.type === 'video';
-  const play = (e) => e.currentTarget.querySelector('video')?.play().catch(() => {});
-  const stop = (e) => {
-    const v = e.currentTarget.querySelector('video');
-    if (v) {
-      v.pause();
-      v.currentTime = 0;
-    }
-  };
+// Silent looping preview that only plays while it's on screen
+function TileVideo({ m }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    v.muted = true;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    }, { threshold: 0.25 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
   return (
-    <button
-      className={`tile ${fresh ? 'is-fresh' : ''}`}
-      onClick={onOpen}
-      onMouseEnter={video ? play : undefined}
-      onMouseLeave={video ? stop : undefined}
-      aria-label={`Open memory from ${m.name}`}
-    >
-      {video ? (
-        <video
-          src={mediaUrl(m.url, 'c_fill,w_600,h_600,q_auto').replace(/\.[a-z0-9]+$/i, '.mp4')}
-          poster={videoPoster(m.url)}
-          muted
-          loop
-          playsInline
-          preload="none"
-        />
+    <video
+      ref={ref}
+      src={mediaUrl(m.url, 'c_fill,w_600,h_600,q_auto').replace(/\.[a-z0-9]+$/i, '.mp4')}
+      poster={videoPoster(m.url)}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+    />
+  );
+}
+
+function Tile({ m, fresh, onOpen }) {
+  return (
+    <button className={`tile ${fresh ? 'is-fresh' : ''}`} onClick={onOpen} aria-label={`Open memory from ${m.name}`}>
+      {m.type === 'video' ? (
+        <TileVideo m={m} />
       ) : (
         <img src={mediaUrl(m.url, 'c_fill,g_auto,w_600,h_600,q_auto,f_auto')} alt={m.caption || ''} loading="lazy" />
       )}
-      {video && <span className="tile-badge" aria-hidden="true">▶</span>}
       <span className="tile-hover">
         <strong>{m.name}</strong>
         {m.caption && <span>{m.caption}</span>}
@@ -42,19 +46,15 @@ function Tile({ m, fresh, onOpen }) {
   );
 }
 
-const TEASER = ['🎂', '📸', '🎉', '🥳', '🎈', '💜', '✨', '🎁', '🌟'];
+const TEASER = ['cake', 'camera', 'sparkles', 'gift', 'balloon', 'heart', 'sparkles', 'camera', 'cake'];
 
 // Placeholder tiles shown (blurred) while everything is locked
 export function TeaserGrid() {
   return (
     <div className="grid">
-      {TEASER.map((e, i) => (
-        <span
-          key={i}
-          className="tile tile-teaser"
-          style={{ '--h': i * 38 + 280 }}
-        >
-          {e}
+      {TEASER.map((name, i) => (
+        <span key={i} className="tile tile-teaser" style={{ '--h': i * 38 + 280 }}>
+          <Icon name={name} size={34} strokeWidth={1.6} />
         </span>
       ))}
     </div>
@@ -74,10 +74,10 @@ export default function MemoryGrid({ memories, onDelete, onUpload }) {
   if (list.length === 0) {
     return (
       <div className="feed-empty">
-        <span className="feed-empty-icon">📷</span>
+        <span className="feed-empty-icon"><Icon name="camera" size={34} strokeWidth={1.6} /></span>
         <strong>No memories yet</strong>
-        <p>Share the first photo or video with {NAME}!</p>
-        {onUpload && <button className="btn btn-primary" onClick={onUpload}>📸 Share a memory</button>}
+        <p>Share the first photo or video with {NAME}.</p>
+        {onUpload && <button className="btn btn-primary" onClick={onUpload}><Icon name="camera" /> Share a memory</button>}
       </div>
     );
   }

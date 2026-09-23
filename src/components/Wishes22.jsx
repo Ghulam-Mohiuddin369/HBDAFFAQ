@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AGE, WISHES_22 } from '../config';
 import { useReveal } from '../useReveal';
+import Icon from './Icon';
 
 export default function Wishes22() {
   const [ref, visible] = useReveal(0.1);
@@ -20,7 +21,7 @@ export default function Wishes22() {
       <h2 className="section-title">{AGE} wishes for year {AGE}</h2>
       <p className="section-sub">Flip every card. Each one is a wish for the year ahead.</p>
       <div className="flip-grid">
-        {WISHES_22.map(([emoji, text], i) => (
+        {WISHES_22.map(([, text], i) => (
           <button
             key={i}
             className={`flip-card ${flipped.has(i) ? 'is-flipped' : ''}`}
@@ -34,7 +35,7 @@ export default function Wishes22() {
                 <span className="flip-q">?</span>
               </span>
               <span className="flip-back">
-                <span className="flip-emoji">{emoji}</span>
+                <span className="flip-emoji"><Icon name="sparkles" size={24} /></span>
                 <span className="flip-text">{text}</span>
               </span>
             </span>

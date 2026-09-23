@@ -5,12 +5,13 @@ import Wishes22 from './Wishes22';
 import Locked from './Locked';
 import PageHeader from './PageHeader';
 import { AGE, NAME } from '../config';
+import Icon from './Icon';
 
 export const GAMES = [
-  ['🎂', 'Blow the candles', `${AGE} candles, one wish`, 'cake'],
-  ['💌', 'Open the letter', 'A note just for him', 'letter'],
-  ['🎈', 'Pop balloons', 'Each hides a message', 'balloons'],
-  ['✨', `${AGE} wishes`, 'Flip all the cards', 'wishes22'],
+  ['cake', 'Blow the candles', `${AGE} candles, one wish`, 'cake'],
+  ['mail', 'Open the letter', 'A note just for him', 'letter'],
+  ['balloon', 'Pop balloons', 'Each hides a message', 'balloons'],
+  ['sparkles', `${AGE} wishes`, 'Flip all the cards', 'wishes22'],
 ];
 
 export default function Games({ lock }) {
@@ -18,7 +19,7 @@ export default function Games({ lock }) {
     <>
       <PageHeader
         title="Play & celebrate"
-        sub={`Blow out ${NAME}'s candles, pop some balloons and flip the wish cards. Tap anywhere for fireworks 🎆`}
+        sub={`Blow out ${NAME}'s candles, pop some balloons and flip the wish cards. Tap anywhere for fireworks.`}
       />
       <div className="game-menu">
         {GAMES.map(([emoji, title, sub, id], i) => (
@@ -28,10 +29,10 @@ export default function Games({ lock }) {
             style={{ '--i': i }}
             onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <span>{emoji}</span>
+            <span className="game-icon"><Icon name={emoji} size={26} strokeWidth={1.8} /></span>
             <strong>{title}</strong>
             <small>{sub}</small>
-            {!lock.open && <em className="game-lock">🔒 Locked</em>}
+            {!lock.open && <em className="game-lock"><Icon name="lock" size={12} /> Locked</em>}
           </button>
         ))}
       </div>

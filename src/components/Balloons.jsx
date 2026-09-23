@@ -41,7 +41,7 @@ export default function Balloons() {
   return (
     <section id="balloons" className="section balloons-section no-fx">
       <h2 className="section-title">Pop a balloon</h2>
-      <p className="section-sub">Every balloon hides a little message 🎈 {popped > 0 && `· ${popped} popped`}</p>
+      <p className="section-sub">Every balloon hides a little message {popped > 0 && `· ${popped} popped`}</p>
       <div className="balloon-field" ref={fieldRef}>
         {balloons.map((b) => (
           <button

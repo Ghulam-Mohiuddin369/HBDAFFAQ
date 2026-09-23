@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api';
 import { NAME } from '../config';
+import Icon from './Icon';
 
 const EMOJIS = ['🎉', '🎂', '🥳', '🎈', '💜', '🌟', '🔥', '🎁'];
 export const NOTE_COLORS = ['#ff9fcb', '#ffe08a', '#8ff3ff', '#c9b0ff', '#9dffc4', '#ffb48f'];
@@ -30,7 +31,7 @@ export default function WishForm({ onDone }) {
   async function submit(e) {
     e.preventDefault();
     if (!name.trim() || !message.trim()) {
-      setError('Add your name and a wish first 🙂');
+      setError('Add your name and a wish first.');
       return;
     }
     setSending(true);
@@ -100,7 +101,7 @@ export default function WishForm({ onDone }) {
         </div>
       </div>
       <button className="btn btn-primary btn-block" disabled={sending}>
-        {sending ? 'Sending…' : 'Send my wish ✨'}
+        {sending ? 'Sending…' : <><Icon name="send" /> Send my wish</>}
       </button>
       {error && <p className="form-error" role="alert">{error}</p>}
     </form>

@@ -23,7 +23,7 @@ export default function Gate({ onOpen }) {
         </span>
         <span className="gift-box" />
       </button>
-      <p className="gate-hint">Tap the gift to open 🎁</p>
+      <p className="gate-hint">Tap the gift to open</p>
     </div>
   );
 }

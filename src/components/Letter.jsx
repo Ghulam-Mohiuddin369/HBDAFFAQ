@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FROM, LETTER } from '../config';
 import { useReveal } from '../useReveal';
+import Icon from './Icon';
 
 const FULL = LETTER.join('\n');
 
@@ -41,11 +42,11 @@ export default function Letter() {
               {i === paragraphs.length - 1 && !done && <span className="caret" />}
             </p>
           ))}
-          {done && <p className="letter-sign">With love, {FROM} 💜</p>}
+          {done && <p className="letter-sign">With love, {FROM}</p>}
         </div>
         <div className="envelope-front" />
         <div className="envelope-flap" />
-        <div className="envelope-seal">💌</div>
+        <div className="envelope-seal"><Icon name="heart" size={22} /></div>
       </div>
       {open && !done && <p className="letter-skip">Tap the letter to skip ahead</p>}
     </section>

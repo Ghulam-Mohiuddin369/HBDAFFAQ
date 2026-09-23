@@ -31,7 +31,7 @@ export default function MemoriesPage({ lock, memories, onDelete }) {
       <section id="memories" className="page-section is-feed">
         <h2 className="section-title">All memories</h2>
         <p className="section-sub">
-          {lock.open ? `${memories.items.length} ${memories.items.length === 1 ? 'memory' : 'memories'} shared 📸` : 'Every memory shows up here at midnight 📸'}
+          {lock.open ? `${memories.items.length} ${memories.items.length === 1 ? 'memory' : 'memories'} shared` : 'Every memory shows up here at midnight'}
         </p>
         <Locked lock={lock} label="The feed opens in" preview={<TeaserGrid />}>
           <MemoryGrid memories={memories} onDelete={onDelete} />
