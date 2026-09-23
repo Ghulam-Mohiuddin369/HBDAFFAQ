@@ -22,18 +22,18 @@ export default function Feed({ tab, onTab, memories, wishes, onDelete, teaser = 
             <span className="verified" title="Birthday verified">✓</span>
           </div>
           <ul className="profile-stats">
-            <li><b>{teaser ? '?' : memories.items.length}</b> memories</li>
-            <li><b>{teaser ? '?' : wishes.items.length}</b> wishes</li>
+            <li><b>{teaser ? '?' : memories.items.length}</b> {memories.items.length === 1 && !teaser ? 'memory' : 'memories'}</li>
+            <li><b>{teaser ? '?' : wishes.items.length}</b> {wishes.items.length === 1 && !teaser ? 'wish' : 'wishes'}</li>
             <li><b>{AGE}</b> years</li>
           </ul>
           <p className="profile-bio">
             <strong>{NAME}</strong>
             {BIO.map((line) => <span key={line}>{line}</span>)}
           </p>
-          <div className="profile-actions">
-            <button className="btn btn-primary btn-sm" onClick={toMemories}><Icon name="camera" size={16} /> Share memory</button>
-            <button className="btn btn-sm" onClick={toWishes}><Icon name="mail" size={16} /> Send wishes</button>
-          </div>
+        </div>
+        <div className="profile-cta">
+          <button className="btn btn-primary btn-sm" onClick={toMemories}><Icon name="camera" size={16} /> Share memory</button>
+          <button className="btn btn-sm" onClick={toWishes}><Icon name="mail" size={16} /> Send wishes</button>
         </div>
       </div>
 

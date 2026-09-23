@@ -37,9 +37,14 @@ export const api = {
   remove: (kind, id) => request(`/api/${kind}?id=${encodeURIComponent(id)}`, { method: 'DELETE' }),
 };
 
+export const isCancelled = (err) => err?.name === 'AbortError';
+const cancelled = () => new DOMException('Upload cancelled', 'AbortError');
+
 // Uploads a file straight to Cloudinary with a server-issued signature. Reports 0..1 progress.
-export async function uploadMedia(file, onProgress) {
-  const sig = await request('/api/upload-signature', { method: 'POST' });
+// Pass an AbortSignal to let the visitor cancel mid-upload.
+export async function uploadMedia(file, onProgress, signal) {
+  const sig = await request('/api/upload-signature', { method: 'POST', signal });
+  if (signal?.aborted) throw cancelled();
   const form = new FormData();
   form.append('file', file);
   form.append('api_key', sig.apiKey);
@@ -60,6 +65,8 @@ export async function uploadMedia(file, onProgress) {
       else reject(new Error(data.error?.message || 'Upload failed'));
     };
     xhr.onerror = () => reject(new Error('Network error while uploading'));
+    xhr.onabort = () => reject(cancelled());
+    signal?.addEventListener('abort', () => xhr.abort(), { once: true });
     xhr.send(form);
   });
 }

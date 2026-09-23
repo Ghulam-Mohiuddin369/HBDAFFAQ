@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { api, uploadMedia } from '../api';
+import { api, isCancelled, uploadMedia } from '../api';
+import { toast } from '../ui';
 import { rememberedName, rememberName } from './WishForm';
 import Icon from './Icon';
 
@@ -16,6 +17,7 @@ export default function UploadForm({ onDone }) {
   const [error, setError] = useState('');
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef(null);
+  const controllerRef = useRef(null);
 
   useEffect(() => () => preview && URL.revokeObjectURL(preview), [preview]);
 
@@ -48,10 +50,13 @@ export default function UploadForm({ onDone }) {
       setError('Add your name so Affaq knows who shared it.');
       return;
     }
+    const controller = new AbortController();
+    controllerRef.current = controller;
     setBusy(true);
     setError('');
     try {
-      const up = await uploadMedia(file, setProgress);
+      const up = await uploadMedia(file, setProgress, controller.signal);
+      if (controller.signal.aborted) return;
       const memory = await api.addMemory({
         name,
         caption,
@@ -63,13 +68,30 @@ export default function UploadForm({ onDone }) {
         duration: up.duration,
       });
       rememberName(name);
+      // clear the form so the next memory can be shared right away
+      setFile(null);
+      setPreview('');
+      setCaption('');
+      if (inputRef.current) inputRef.current.value = '';
       onDone(memory);
     } catch (err) {
-      setError(err.message);
-      setBusy(false);
-      setProgress(0);
+      if (isCancelled(err)) toast('Upload cancelled.', 'info');
+      else setError(err.message);
+    } finally {
+      if (controllerRef.current === controller) {
+        controllerRef.current = null;
+        setBusy(false);
+        setProgress(0);
+      }
     }
   }
+
+  function cancel() {
+    controllerRef.current?.abort();
+  }
+
+  // stop an in-flight upload if the visitor leaves the page
+  useEffect(() => () => controllerRef.current?.abort(), []);
 
   return (
     <form className="upload-form" onSubmit={submit}>
@@ -126,19 +148,26 @@ export default function UploadForm({ onDone }) {
       </label>
 
       {/* the button itself fills up as the upload progresses */}
-      <button
-        className={`btn btn-primary btn-block btn-progress ${busy ? 'is-busy' : ''}`}
-        disabled={busy}
-        style={{ '--p': `${Math.round(progress * 100)}%` }}
-        aria-live="polite"
-      >
-        <span className="btn-progress-fill" aria-hidden="true" />
-        <span className="btn-progress-label">
-          {!busy && <><Icon name="upload" /> Share this memory</>}
-          {busy && progress < 1 && `Uploading ${Math.round(progress * 100)}%`}
-          {busy && progress >= 1 && 'Almost done…'}
-        </span>
-      </button>
+      <div className="upload-actions">
+        <button
+          className={`btn btn-primary btn-block btn-progress ${busy ? 'is-busy' : ''}`}
+          disabled={busy}
+          style={{ '--p': `${Math.round(progress * 100)}%` }}
+          aria-live="polite"
+        >
+          <span className="btn-progress-fill" aria-hidden="true" />
+          <span className="btn-progress-label">
+            {!busy && <><Icon name="upload" /> Share this memory</>}
+            {busy && progress < 1 && `Uploading ${Math.round(progress * 100)}%`}
+            {busy && progress >= 1 && 'Almost done…'}
+          </span>
+        </button>
+        {busy && (
+          <button type="button" className="btn btn-cancel" onClick={cancel}>
+            <Icon name="x" size={16} /> Cancel
+          </button>
+        )}
+      </div>
       {error && <p className="form-error" role="alert">{error}</p>}
     </form>
   );
