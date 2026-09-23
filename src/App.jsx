@@ -15,7 +15,7 @@ import { useUnlock } from './lock';
 import { dialog, toast } from './ui';
 import { fx } from './fx';
 import { music } from './music';
-import { AGE, NAME } from './config';
+import { AGE, NAME, ordinal } from './config';
 import { navigate, usePage } from './router';
 import Icon from './components/Icon';
 
@@ -102,7 +102,7 @@ export default function App() {
           <main key={page} onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
             <ErrorBoundary>{pages[page]}</ErrorBoundary>
             <footer className="site-footer">
-              <p className="footer-love">Made with <Icon name="heart" size={15} /> for {NAME}&apos;s {AGE}nd birthday</p>
+              <p className="footer-love">Made with <Icon name="heart" size={15} /> for {NAME}&apos;s {ordinal(AGE)} birthday</p>
               <div className="profile-actions">
                 {page !== 'home' && <button className="btn btn-sm" onClick={() => navigate('/')}><Icon name="home" size={16} /> Home</button>}
                 {page !== 'wishes' && <button className="btn btn-sm" onClick={() => navigate('/wishes')}><Icon name="mail" size={16} /> Send wishes</button>}

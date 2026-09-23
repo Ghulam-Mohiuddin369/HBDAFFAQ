@@ -16,7 +16,7 @@ export const SAMPLE_WISHES = {
   fresh: new Set(),
   items: [
     ['Happy birthday! Have the best year ever 🎉', '🎉'],
-    ['22 looks good on you, legend!', '🔥'],
+    ['21 looks good on you, legend!', '🔥'],
     ['Wishing you all the happiness in the world', '💜'],
     ['Cake first, then the party 🎂', '🎂'],
     ['So proud of you, bro. Keep shining', '🌟'],

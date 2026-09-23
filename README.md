@@ -1,6 +1,6 @@
-# Happy 22nd Birthday, Affaq 🎉
+# Happy 21st Birthday, Affaq 🎉
 
-An animated birthday site with an Instagram-style feed where anyone can post **wishes** and **memories** (photos and videos), plus a **Play games** page (candles, balloons, letter, 22 wish cards).
+An animated birthday site with an Instagram-style feed where anyone can post **wishes** and **memories** (photos and videos), plus a **Play games** page (candles, balloons, letter, 21 wish cards).
 
 - Frontend: React and Vite
 - API: Vercel serverless functions in `/api`
@@ -33,4 +33,4 @@ npm run dev            # http://localhost:5173. The /api routes run inside the V
 
 ## Personalize
 
-Edit `src/config.js` to change the birthday date (countdown), the profile handle, bio and avatar, the letter, the 22 wishes and the balloon messages.
+Edit `src/config.js` to change the birthday date (countdown), the profile handle, bio and avatar, the letter, the wish cards and the balloon messages.

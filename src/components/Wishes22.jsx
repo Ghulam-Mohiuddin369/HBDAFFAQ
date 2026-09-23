@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AGE, WISHES_22 } from '../config';
+import { AGE, WISHES } from '../config';
 import { useReveal } from '../useReveal';
 import Icon from './Icon';
 
@@ -21,7 +21,7 @@ export default function Wishes22() {
       <h2 className="section-title">{AGE} wishes for year {AGE}</h2>
       <p className="section-sub">Flip every card. Each one is a wish for the year ahead.</p>
       <div className="flip-grid">
-        {WISHES_22.map(([, text], i) => (
+        {WISHES.slice(0, AGE).map(([, text], i) => (
           <button
             key={i}
             className={`flip-card ${flipped.has(i) ? 'is-flipped' : ''}`}
