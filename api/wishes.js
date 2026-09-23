@@ -1,15 +1,18 @@
 import { ObjectId } from 'mongodb';
 import { route, send, readJson, cleanText, getQuery, isAdmin, HttpError } from './_lib/http.js';
 import { getDb, publicDoc } from './_lib/db.js';
+import { isLocked } from './_lib/lock.js';
 
 export default route({
   GET: async (req, res) => {
+    if (isLocked(req)) return send(res, 200, { wishes: [], locked: true });
     const db = await getDb();
     const docs = await db.collection('wishes').find({}).sort({ createdAt: -1 }).limit(500).toArray();
     send(res, 200, { wishes: docs.map(publicDoc) });
   },
 
   POST: async (req, res) => {
+    if (isLocked(req)) throw new HttpError(423, 'This opens at midnight on his birthday 🎂');
     const body = await readJson(req);
     const name = cleanText(body.name, 40);
     const message = cleanText(body.message, 280);

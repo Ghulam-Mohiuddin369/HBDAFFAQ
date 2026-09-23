@@ -1,10 +1,11 @@
 import ParticleTitle from './ParticleTitle';
+import Countdown from './Countdown';
 import { fx } from '../fx';
 import { AGE, NAME } from '../config';
 
 const LINE = 'Happy Birthday';
 
-export default function Hero() {
+export default function Hero({ lock }) {
   function celebrate() {
     fx.show(7, 2200);
     setTimeout(() => fx.confetti(140), 900);
@@ -22,7 +23,14 @@ export default function Hero() {
         ))}
       </h1>
       <h2 className="hero-name">{NAME}</h2>
-      <p className="hero-tip">Tap anywhere for fireworks · move over the {AGE} to play</p>
+      {lock.open ? (
+        <p className="hero-tip">Tap anywhere for fireworks · move over the {AGE} to play</p>
+      ) : (
+        <div className="hero-lock">
+          <p>🔒 The party unlocks at midnight</p>
+          <Countdown left={lock.left} />
+        </div>
+      )}
       <a className="scroll-cue" href="#feed" aria-label="Scroll down">
         <span />
       </a>

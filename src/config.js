@@ -3,9 +3,9 @@
 export const NAME = 'Affaq';
 export const AGE = 22;
 
-// His birthday in local time, e.g. '2026-10-05T00:00:00'.
-// Before that moment the site shows a live countdown. Leave null to hide it.
-export const BIRTHDAY = null;
+// 🔒 Everything stays blurred and locked until this exact moment, then opens for everyone.
+// Midnight Pakistan time on his birthday, e.g. '2026-10-05T00:00:00+05:00'. null = never locked.
+export const UNLOCK_AT = null;
 
 // Who the letter is from
 export const FROM = 'Your best friend';

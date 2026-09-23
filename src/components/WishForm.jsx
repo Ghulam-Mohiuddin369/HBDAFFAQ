@@ -54,7 +54,7 @@ export default function WishForm({ onDone }) {
       </div>
       <label className="field">
         <span>Your name</span>
-        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="e.g. Ali" autoFocus />
+        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="e.g. Ali" />
       </label>
       <label className="field">
         <span>Your wish</span>

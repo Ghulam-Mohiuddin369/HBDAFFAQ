@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
-// Minimal two-page router: "/" (home) and "/games". Vercel rewrites every path to index.html.
+// Tiny pathname router. Vercel rewrites every non-API path to index.html.
+const PAGES = { '/': 'home', '/wishes': 'wishes', '/memories': 'memories', '/games': 'games' };
+
 export function navigate(path, anchor) {
   if (window.location.pathname !== path) {
     window.history.pushState(null, '', path);
@@ -14,10 +16,17 @@ export function navigate(path, anchor) {
   }, 80);
 }
 
-export function usePath() {
-  const [path, setPath] = useState(window.location.pathname);
+function current() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  return PAGES[path];
+}
+
+export function usePage() {
+  const [page, setPage] = useState(() => current() || 'home');
   useEffect(() => {
-    const update = () => setPath(window.location.pathname);
+    // unknown paths fall back to home
+    if (!current()) window.history.replaceState(null, '', '/');
+    const update = () => setPage(current() || 'home');
     window.addEventListener('popstate', update);
     window.addEventListener('route', update);
     return () => {
@@ -25,5 +34,5 @@ export function usePath() {
       window.removeEventListener('route', update);
     };
   }, []);
-  return path.replace(/\/+$/, '') === '/games' ? 'games' : 'home';
+  return page;
 }

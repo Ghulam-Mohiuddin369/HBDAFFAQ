@@ -73,7 +73,7 @@ export function videoPoster(url, transform = 'so_0,c_fill,w_600,h_600,q_auto') {
 }
 
 // Loads a list and keeps polling it so new posts from other visitors show up.
-export function useLiveList(fetcher, intervalMs = 15000) {
+export function useLiveList(fetcher, enabled = true, intervalMs = 15000) {
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [fresh, setFresh] = useState(() => new Set());
@@ -95,10 +95,11 @@ export function useLiveList(fetcher, intervalMs = 15000) {
   }, [fetcher]);
 
   useEffect(() => {
+    if (!enabled) return undefined;
     load();
     const id = setInterval(() => document.visibilityState === 'visible' && load(), intervalMs);
     return () => clearInterval(id);
-  }, [load, intervalMs]);
+  }, [load, intervalMs, enabled]);
 
   // Optimistically show the visitor's own post right away
   const prepend = useCallback((item) => {

@@ -2,17 +2,20 @@ import { ObjectId } from 'mongodb';
 import { route, send, readJson, cleanText, getQuery, isAdmin, HttpError } from './_lib/http.js';
 import { getDb, publicDoc } from './_lib/db.js';
 import { destroy, FOLDER } from './_lib/cloudinary.js';
+import { isLocked } from './_lib/lock.js';
 
 const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : null);
 
 export default route({
   GET: async (req, res) => {
+    if (isLocked(req)) return send(res, 200, { memories: [], locked: true });
     const db = await getDb();
     const docs = await db.collection('memories').find({}).sort({ createdAt: -1 }).limit(500).toArray();
     send(res, 200, { memories: docs.map(publicDoc) });
   },
 
   POST: async (req, res) => {
+    if (isLocked(req)) throw new HttpError(423, 'This opens at midnight on his birthday 🎂');
     const body = await readJson(req);
     const cloud = process.env.CLOUDINARY_CLOUD_NAME;
     const type = body.type === 'video' ? 'video' : 'image';

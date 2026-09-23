@@ -1,42 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Starfield from './components/Starfield';
 import Fireworks from './components/Fireworks';
 import Gate from './components/Gate';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import Countdown from './components/Countdown';
-import Feed from './components/Feed';
 import Games from './components/Games';
-import Modal from './components/Modal';
-import WishForm from './components/WishForm';
-import UploadForm from './components/UploadForm';
 import MusicToggle from './components/MusicToggle';
+import Popups from './components/Popups';
+import ErrorBoundary from './components/ErrorBoundary';
+import HomePage from './pages/HomePage';
+import WishesPage from './pages/WishesPage';
+import MemoriesPage from './pages/MemoriesPage';
 import { api, useLiveList } from './api';
+import { useUnlock } from './lock';
+import { dialog, toast } from './ui';
 import { fx } from './fx';
 import { music } from './music';
 import { AGE, NAME } from './config';
-import { navigate, usePath } from './router';
+import { navigate, usePage } from './router';
 
 const INTERACTIVE = 'button, a, input, textarea, label, video, .no-fx';
 const finePointer = typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
 
-function celebrate() {
-  fx.confetti(180);
-  fx.show(4, 1200);
-}
-
-function showFeed() {
-  navigate('/', 'feed');
-}
-
 export default function App() {
-  const page = usePath();
+  const page = usePage();
+  const lock = useUnlock();
   const [opened, setOpened] = useState(false);
   const [gateGone, setGateGone] = useState(false);
-  const [modal, setModal] = useState(null); // 'wish' | 'upload' | null
-  const [tab, setTab] = useState('memories');
-  const memories = useLiveList(api.memories);
-  const wishes = useLiveList(api.wishes);
+  const memories = useLiveList(api.memories, lock.open);
+  const wishes = useLiveList(api.wishes, lock.open);
+
+  // Midnight: celebrate for everyone who has the page open
+  const wasOpen = useRef(lock.open);
+  useEffect(() => {
+    if (lock.open && !wasOpen.current && !lock.admin) {
+      fx.show(14, 4000);
+      fx.confetti(300);
+      dialog({
+        icon: '🎂',
+        title: `It's ${NAME}'s birthday!`,
+        message: 'Everything is unlocked. Send your wishes, share memories and play the games!',
+        confirmText: "Let's party 🎉",
+      });
+    }
+    wasOpen.current = lock.open;
+  }, [lock.open, lock.admin]);
 
   function open() {
     music.start();
@@ -55,14 +62,29 @@ export default function App() {
   }
 
   async function remove(kind, item) {
-    if (!window.confirm('Delete this for everyone?')) return;
+    const ok = await dialog({
+      icon: '🗑️',
+      title: 'Delete this for everyone?',
+      message: 'This removes it from the site permanently.',
+      confirmText: 'Delete',
+      cancelText: 'Keep it',
+    });
+    if (!ok) return;
     try {
       await api.remove(kind, item.id);
       (kind === 'wishes' ? wishes : memories).removeLocal(item.id);
+      toast('Deleted.', 'success');
     } catch (err) {
-      window.alert(err.message);
+      toast(err.message, 'error');
     }
   }
+
+  const pages = {
+    home: <HomePage lock={lock} memories={memories} wishes={wishes} onDelete={remove} />,
+    wishes: <WishesPage lock={lock} wishes={wishes} onDelete={remove} />,
+    memories: <MemoriesPage lock={lock} memories={memories} onDelete={remove} />,
+    games: <Games lock={lock} />,
+  };
 
   return (
     <>
@@ -70,68 +92,25 @@ export default function App() {
       <div className="nebula" aria-hidden="true" />
       {opened && (
         <>
-          <Header page={page} onWish={() => setModal('wish')} onUpload={() => setModal('upload')} />
-          <main onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
-            {page === 'games' ? (
-              <Games />
-            ) : (
-              <>
-                <Hero />
-                <Countdown />
-                <Feed
-                  tab={tab}
-                  onTab={setTab}
-                  memories={memories}
-                  wishes={wishes}
-                  onWish={() => setModal('wish')}
-                  onUpload={() => setModal('upload')}
-                  onDelete={remove}
-                />
-              </>
-            )}
+          <Header page={page} />
+          <main key={page} onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
+            <ErrorBoundary>{pages[page]}</ErrorBoundary>
             <footer className="site-footer">
               <p>Made with 💜 for {NAME}&apos;s {AGE}nd birthday</p>
               <div className="profile-actions">
-                <button className="btn btn-primary" onClick={() => setModal('upload')}>📸 Upload a memory</button>
-                <button className="btn btn-ghost" onClick={() => setModal('wish')}>💌 Give a wish</button>
-                {page === 'games' ? (
-                  <button className="btn btn-ghost" onClick={() => navigate('/')}>🏠 Back home</button>
-                ) : (
-                  <button className="btn btn-ghost" onClick={() => navigate('/games')}>🎮 Play games</button>
-                )}
+                {page !== 'home' && <button className="btn btn-sm" onClick={() => navigate('/')}>🏠 Home</button>}
+                {page !== 'wishes' && <button className="btn btn-sm" onClick={() => navigate('/wishes')}>💌 Send wishes</button>}
+                {page !== 'memories' && <button className="btn btn-sm" onClick={() => navigate('/memories')}>📸 Share memory</button>}
+                {page !== 'games' && <button className="btn btn-sm" onClick={() => navigate('/games')}>🎮 Games</button>}
               </div>
             </footer>
-            <MusicToggle />
           </main>
+          <MusicToggle />
+          {lock.admin && <span className="admin-badge">👑 Admin preview: unlocked for you only</span>}
         </>
       )}
-      {modal === 'wish' && (
-        <Modal title={`Wish ${NAME} a happy birthday`} onClose={() => setModal(null)}>
-          <WishForm
-            onDone={(wish) => {
-              wishes.prepend(wish);
-              setModal(null);
-              setTab('wishes');
-              showFeed();
-              celebrate();
-            }}
-          />
-        </Modal>
-      )}
-      {modal === 'upload' && (
-        <Modal title="Share a memory" onClose={() => setModal(null)}>
-          <UploadForm
-            onDone={(memory) => {
-              memories.prepend(memory);
-              setModal(null);
-              setTab('memories');
-              showFeed();
-              celebrate();
-            }}
-          />
-        </Modal>
-      )}
       {!gateGone && <Gate onOpen={open} />}
+      <Popups />
       <Fireworks />
     </>
   );

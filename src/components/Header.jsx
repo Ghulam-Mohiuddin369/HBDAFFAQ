@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react';
 import { navigate } from '../router';
 import { AGE, NAME } from '../config';
 
-export default function Header({ page, onWish, onUpload }) {
+const LINKS = [
+  ['wishes', '/wishes', '💌', 'Send wishes', 'Wishes'],
+  ['memories', '/memories', '📸', 'Share memory', 'Memory'],
+  ['games', '/games', '🎮', 'Games', 'Games'],
+];
+
+export default function Header({ page }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -19,26 +25,25 @@ export default function Header({ page, onWish, onUpload }) {
 
   return (
     <header className={`topbar ${scrolled ? 'is-scrolled' : ''}`}>
-      <a href="/" className="brand" onClick={(e) => go(e, '/')}>
-        {NAME}
-        <span>✦{AGE}</span>
+      <a href="/" className="brand" onClick={(e) => go(e, '/')} aria-label="Home">
+        <span className="brand-icon">🎂</span>
+        <span className="brand-name">{NAME}</span>
+        <span className="brand-age">✦{AGE}</span>
       </a>
-      <nav className="topbar-actions">
-        <button className="btn btn-ghost btn-sm" onClick={onWish}>
-          💌 <span className="label-full">Give a wish</span><span className="label-short">Wish</span>
-        </button>
-        <button className="btn btn-primary btn-sm" onClick={onUpload}>
-          📸 <span className="label-full">Upload a memory</span><span className="label-short">Upload</span>
-        </button>
-        {page === 'games' ? (
-          <a href="/" className="btn btn-ghost btn-sm" onClick={(e) => go(e, '/')}>
-            🏠 <span className="label-full">Home</span>
+      <nav className="glass-nav" aria-label="Pages">
+        {LINKS.map(([key, path, icon, full, short]) => (
+          <a
+            key={key}
+            href={path}
+            className={`nav-pill ${page === key ? 'is-active' : ''}`}
+            aria-current={page === key ? 'page' : undefined}
+            onClick={(e) => go(e, path)}
+          >
+            <span aria-hidden="true">{icon}</span>
+            <span className="full">{full}</span>
+            <span className="short">{short}</span>
           </a>
-        ) : (
-          <a href="/games" className="btn btn-ghost btn-sm" onClick={(e) => go(e, '/games')}>
-            🎮 <span className="label-full">Play games</span><span className="label-short">Games</span>
-          </a>
-        )}
+        ))}
       </nav>
     </header>
   );
